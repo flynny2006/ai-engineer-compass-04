@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from "react";
-import { Folder, File, Trash2, Edit, Plus, X, ArrowDown, ArrowUp, FolderPlus, Move } from "lucide-react";
+import { Folder, File, Trash2, Edit, Plus, X, ArrowDown, ArrowUp, FolderPlus, Copy } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -225,6 +226,111 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, setFiles, currentFil
     }
   };
 
+  // Duplicate file
+  const handleDuplicateFile = (folder: string, file: FileItem) => {
+    const fullPath = folder === "/" ? file.name : `${folder}/${file.name}`;
+    const fileName = fullPath.split('/').pop() || "";
+    const fileDir = fullPath.substring(0, fullPath.length - fileName.length);
+    
+    // Create a new name with '-copy' suffix
+    let baseName = fileName;
+    let extension = "";
+    
+    const lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex !== -1) {
+      baseName = fileName.substring(0, lastDotIndex);
+      extension = fileName.substring(lastDotIndex);
+    }
+    
+    let copyName = `${baseName}-copy${extension}`;
+    let copyPath = fileDir + copyName;
+    let copyCounter = 1;
+    
+    // If a file with that name already exists, add a number
+    while (files.some(f => f.name === copyPath)) {
+      copyName = `${baseName}-copy-${copyCounter}${extension}`;
+      copyPath = fileDir + copyName;
+      copyCounter++;
+    }
+    
+    // Create the duplicate file
+    const duplicatedFile = {
+      name: copyPath,
+      content: file.content,
+      type: file.type
+    };
+    
+    setFiles(prev => [...prev, duplicatedFile]);
+    
+    toast({
+      title: "Success",
+      description: `File duplicated as "${copyName}"`
+    });
+  };
+
+  // Duplicate folder
+  const handleDuplicateFolder = (folderPath: string) => {
+    const folderName = folderPath.split('/').pop() || "";
+    const parentFolder = folderPath.substring(0, folderPath.length - folderName.length - 1);
+    const basePath = parentFolder ? `${parentFolder}/` : "";
+    
+    // Create a new folder name with '-copy' suffix
+    let copyFolderName = `${folderName}-copy`;
+    let copyFolderPath = basePath + copyFolderName;
+    let copyCounter = 1;
+    
+    // If folder with that name already exists, add a number
+    while (allFolders.includes(copyFolderPath)) {
+      copyFolderName = `${folderName}-copy-${copyCounter}`;
+      copyFolderPath = basePath + copyFolderName;
+      copyCounter++;
+    }
+    
+    // Find all files in the folder to duplicate
+    const filesToDuplicate = files.filter(file => 
+      file.name.startsWith(`${folderPath}/`)
+    );
+    
+    // Create duplicates of all files with the new folder prefix
+    const duplicatedFiles = filesToDuplicate.map(file => {
+      const relativePath = file.name.substring(folderPath.length);
+      return {
+        name: `${copyFolderPath}${relativePath}`,
+        content: file.content,
+        type: file.type
+      };
+    });
+    
+    if (duplicatedFiles.length > 0) {
+      setFiles(prev => [...prev, ...duplicatedFiles]);
+      
+      // Expand the parent folder
+      setExpandedFolders(prev => ({
+        ...prev,
+        [parentFolder || "/"]: true,
+      }));
+      
+      toast({
+        title: "Success",
+        description: `Folder duplicated as "${copyFolderName}"`
+      });
+    } else {
+      // Create at least one placeholder file to establish the folder
+      const placeholderFile = {
+        name: `${copyFolderPath}/.gitkeep`,
+        content: "",
+        type: "txt"
+      };
+      
+      setFiles(prev => [...prev, placeholderFile]);
+      
+      toast({
+        title: "Success",
+        description: `Empty folder duplicated as "${copyFolderName}"`
+      });
+    }
+  };
+
   // Rename file
   const handleRenameFileClick = (folder: string, file: FileItem) => {
     const fullPath = folder === "/" ? file.name : `${folder}/${file.name}`;
@@ -389,18 +495,38 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, setFiles, currentFil
             "flex items-center gap-1 px-2 py-1 rounded hover:bg-muted cursor-pointer text-sm font-medium",
             dragOverFolder === folderPath && "bg-accent"
           )}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            if (folderPath !== "/") {
-              handleDeleteFolder(folderPath);
-            }
-          }}
         >
           {isExpanded ? <ArrowDown className="h-3.5 w-3.5" /> : <ArrowUp className="h-3.5 w-3.5" />}
           <Folder className="h-4 w-4 text-amber-500" />
           <span>{folderName}</span>
           
           <div className="ml-auto flex items-center">
+            {folderPath !== "/" && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDuplicateFolder(folderPath);
+                  }}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFolder(folderPath);
+                  }}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -474,6 +600,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, setFiles, currentFil
                     <span className="truncate">{file.name}</span>
                   </div>
                   <div className="flex items-center">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicateFile(folderPath, file);
+                      }}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="icon" 

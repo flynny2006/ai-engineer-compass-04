@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { highlightCode } from "@/lib/syntaxHighlighter";
 
 interface CodeEditorProps {
   value: string;
@@ -12,10 +13,12 @@ interface CodeEditorProps {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ value, onChange, language }) => {
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  const highlightedCodeRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState<number>(1);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [highlightedCode, setHighlightedCode] = useState<string>("");
   
   // HTML suggestions for autocomplete
   const htmlSuggestions = [
@@ -73,15 +76,33 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ value, onChange, language }) =>
     { tag: "html", snippet: "<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Document</title>\n  </head>\n  <body>\n    \n  </body>\n</html>" }
   ];
   
-  // Update line count when content changes
+  // Update line count and syntax highlighting when content changes
   useEffect(() => {
     if (value) {
-      const lines = value.split('\n').length;
-      setLineCount(lines);
+      const lines = value.split('\n');
+      setLineCount(lines.length);
+      setHighlightedCode(highlightCode(value, language));
     } else {
       setLineCount(1);
+      setHighlightedCode("");
     }
-  }, [value]);
+  }, [value, language]);
+  
+  // Sync scroll between textarea and highlighted code
+  useEffect(() => {
+    const textarea = editorRef.current;
+    const highlightedDiv = highlightedCodeRef.current;
+    
+    if (!textarea || !highlightedDiv) return;
+    
+    const syncScroll = () => {
+      highlightedDiv.scrollTop = textarea.scrollTop;
+      highlightedDiv.scrollLeft = textarea.scrollLeft;
+    };
+    
+    textarea.addEventListener('scroll', syncScroll);
+    return () => textarea.removeEventListener('scroll', syncScroll);
+  }, []);
   
   // Handle key combinations
   useEffect(() => {
@@ -240,23 +261,39 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ value, onChange, language }) =>
         </div>
       )}
       <div className="flex flex-1 overflow-hidden font-mono text-sm">
-        <div className="bg-muted py-4 flex flex-col overflow-hidden">
+        <div className="bg-muted py-4 flex flex-col overflow-hidden w-[40px] min-w-[40px] text-sm">
           {renderLineNumbers()}
         </div>
-        <textarea
-          ref={editorRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          className={`flex-1 p-4 bg-background resize-none overflow-auto w-full border-0 focus:outline-none code-editor`}
-          style={{
-            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-            lineHeight: 1.5,
-            tabSize: 2,
-            paddingLeft: '0.5rem'
-          }}
-        />
+        <div className="relative flex-1 overflow-auto">
+          {/* Highlighted code - positioned absolute behind the textarea */}
+          <div 
+            ref={highlightedCodeRef}
+            className="absolute top-0 left-0 right-0 p-4 whitespace-pre font-mono text-sm pointer-events-none"
+            style={{
+              fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+              lineHeight: 1.5,
+              paddingLeft: '0.5rem',
+            }}
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+          ></div>
+
+          {/* Actual textarea for editing - transparent background to show highlighted code */}
+          <textarea
+            ref={editorRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            spellCheck={false}
+            className="bg-transparent text-transparent caret-white absolute top-0 left-0 right-0 h-full p-4 resize-none overflow-auto w-full border-0 focus:outline-none"
+            style={{
+              fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+              lineHeight: 1.5,
+              tabSize: 2,
+              paddingLeft: '0.5rem',
+              caretColor: 'white'
+            }}
+          />
+        </div>
       </div>
     </div>
   );
