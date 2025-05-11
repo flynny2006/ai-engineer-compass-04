@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Code, Send, Play, Eye, MessageSquare, Sun, Moon, Save, Trash, Maximize,
 import { useTheme } from "@/hooks/use-theme";
 import { Toggle } from "@/components/ui/toggle";
 import { Progress } from "@/components/ui/progress";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -102,6 +102,7 @@ const UNLIMITED_CODE = "3636";
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [files, setFiles] = useState(() => {
     const savedFiles = localStorage.getItem("project_files");
     return savedFiles ? JSON.parse(savedFiles) : initialFiles;
@@ -583,6 +584,14 @@ Full file content here
           <h1 className="text-xl font-semibold">AI Code Engineer</h1>
         </div>
         <div className="flex gap-2 items-center">
+          <Button 
+            size="sm" 
+            variant="ghost"
+            onClick={() => navigate("/pricing")}
+            className="mr-2"
+          >
+            Pricing
+          </Button>
           <div className="flex items-center gap-2 mr-4">
             <span className="text-sm font-medium">
               Daily Credits: {hasUnlimitedCredits ? "∞" : `${credits}/${DAILY_CREDIT_LIMIT}`}

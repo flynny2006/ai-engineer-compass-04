@@ -76,6 +76,28 @@ const TS_PATTERNS = {
   type: /\b[A-Z][a-zA-Z0-9_$]*\b/g,
 };
 
+// Color mapping for token types - ensure vibrant colors for all code types
+const TOKEN_COLORS = {
+  keyword: "#8B5CF6",    // Vivid Purple
+  string: "#ea384c",     // Red
+  comment: "#6B7280",    // Gray
+  number: "#F97316",     // Bright Orange
+  function: "#1EAEDB",   // Bright Blue
+  tag: "#D946EF",        // Magenta Pink
+  attribute: "#FEC6A1",  // Soft Orange
+  selector: "#D946EF",   // Magenta Pink
+  property: "#D946EF",   // Magenta Pink
+  value: "#1EAEDB",      // Bright Blue
+  unit: "#F97316",       // Bright Orange
+  punctuation: "#D1D5DB", // Light Gray
+  operator: "#FEF7CD",   // Soft Yellow
+  type: "#F2FCE2",       // Soft Green
+  class: "#F2FCE2",      // Soft Green
+  variable: "#FDE1D3",   // Soft Peach
+  bracket: "#D1D5DB",    // Light Gray
+  text: "#ffffff",       // White
+};
+
 /**
  * A simple highlighting function for demo purposes
  * In a real implementation, you would want to use a proper tokenizer
@@ -87,56 +109,56 @@ export function highlightCode(code: string, language: string): string {
     case 'html':
       // Apply HTML highlighting patterns
       highlightedCode = highlightedCode
-        .replace(HTML_PATTERNS.comment, match => `<span class="comment">${match}</span>`)
-        .replace(HTML_PATTERNS.tag, match => `<span class="tag">${match}</span>`)
-        .replace(HTML_PATTERNS.attribute, match => `<span class="attribute">${match}</span>`)
-        .replace(HTML_PATTERNS.string, match => `<span class="string">${match}</span>`);
+        .replace(HTML_PATTERNS.comment, match => `<span class="comment" style="color:${TOKEN_COLORS.comment}">${match}</span>`)
+        .replace(HTML_PATTERNS.tag, match => `<span class="tag" style="color:${TOKEN_COLORS.tag}">${match}</span>`)
+        .replace(HTML_PATTERNS.attribute, match => `<span class="attribute" style="color:${TOKEN_COLORS.attribute}">${match}</span>`)
+        .replace(HTML_PATTERNS.string, match => `<span class="string" style="color:${TOKEN_COLORS.string}">${match}</span>`);
       break;
       
     case 'css':
       // Apply CSS highlighting patterns
       highlightedCode = highlightedCode
-        .replace(CSS_PATTERNS.comment, match => `<span class="comment">${match}</span>`)
-        .replace(CSS_PATTERNS.selector, match => `<span class="selector">${match}</span>`)
-        .replace(CSS_PATTERNS.property, match => `<span class="property">${match}</span>`)
-        .replace(CSS_PATTERNS.value, match => `<span class="value">${match}</span>`)
-        .replace(CSS_PATTERNS.unit, match => `<span class="number">${match}</span>`)
-        .replace(CSS_PATTERNS.string, match => `<span class="string">${match}</span>`);
+        .replace(CSS_PATTERNS.comment, match => `<span class="comment" style="color:${TOKEN_COLORS.comment}">${match}</span>`)
+        .replace(CSS_PATTERNS.selector, match => `<span class="selector" style="color:${TOKEN_COLORS.selector}">${match}</span>`)
+        .replace(CSS_PATTERNS.property, match => `<span class="property" style="color:${TOKEN_COLORS.property}">${match}</span>`)
+        .replace(CSS_PATTERNS.value, match => `<span class="value" style="color:${TOKEN_COLORS.value}">${match}</span>`)
+        .replace(CSS_PATTERNS.unit, match => `<span class="number" style="color:${TOKEN_COLORS.number}">${match}</span>`)
+        .replace(CSS_PATTERNS.string, match => `<span class="string" style="color:${TOKEN_COLORS.string}">${match}</span>`);
       break;
       
     case 'js':
       // Apply JavaScript highlighting patterns
       highlightedCode = highlightedCode
-        .replace(JS_PATTERNS.comment, match => `<span class="comment">${match}</span>`)
-        .replace(JS_PATTERNS.string, match => `<span class="string">${match}</span>`)
-        .replace(JS_PATTERNS.keyword, match => `<span class="keyword">${match}</span>`)
-        .replace(JS_PATTERNS.function, match => `<span class="function">${match}</span>`)
-        .replace(JS_PATTERNS.number, match => `<span class="number">${match}</span>`)
-        .replace(JS_PATTERNS.operator, match => `<span class="operator">${match}</span>`)
-        .replace(JS_PATTERNS.punctuation, match => `<span class="punctuation">${match}</span>`);
+        .replace(JS_PATTERNS.comment, match => `<span class="comment" style="color:${TOKEN_COLORS.comment}">${match}</span>`)
+        .replace(JS_PATTERNS.string, match => `<span class="string" style="color:${TOKEN_COLORS.string}">${match}</span>`)
+        .replace(JS_PATTERNS.keyword, match => `<span class="keyword" style="color:${TOKEN_COLORS.keyword}">${match}</span>`)
+        .replace(JS_PATTERNS.function, match => `<span class="function" style="color:${TOKEN_COLORS.function}">${match}</span>`)
+        .replace(JS_PATTERNS.number, match => `<span class="number" style="color:${TOKEN_COLORS.number}">${match}</span>`)
+        .replace(JS_PATTERNS.operator, match => `<span class="operator" style="color:${TOKEN_COLORS.operator}">${match}</span>`)
+        .replace(JS_PATTERNS.punctuation, match => `<span class="punctuation" style="color:${TOKEN_COLORS.punctuation}">${match}</span>`);
       break;
       
     case 'json':
       // Apply JSON highlighting patterns
       highlightedCode = highlightedCode
-        .replace(JSON_PATTERNS.key, match => `<span class="property">${match}</span>`)
-        .replace(JSON_PATTERNS.string, match => `<span class="string">${match}</span>`)
-        .replace(JSON_PATTERNS.number, match => `<span class="number">${match}</span>`)
-        .replace(JSON_PATTERNS.keyword, match => `<span class="keyword">${match}</span>`)
-        .replace(JSON_PATTERNS.punctuation, match => `<span class="punctuation">${match}</span>`);
+        .replace(JSON_PATTERNS.key, match => `<span class="property" style="color:${TOKEN_COLORS.property}">${match}</span>`)
+        .replace(JSON_PATTERNS.string, match => `<span class="string" style="color:${TOKEN_COLORS.string}">${match}</span>`)
+        .replace(JSON_PATTERNS.number, match => `<span class="number" style="color:${TOKEN_COLORS.number}">${match}</span>`)
+        .replace(JSON_PATTERNS.keyword, match => `<span class="keyword" style="color:${TOKEN_COLORS.keyword}">${match}</span>`)
+        .replace(JSON_PATTERNS.punctuation, match => `<span class="punctuation" style="color:${TOKEN_COLORS.punctuation}">${match}</span>`);
       break;
       
     case 'ts':
       // Apply TypeScript highlighting patterns
       highlightedCode = highlightedCode
-        .replace(TS_PATTERNS.comment, match => `<span class="comment">${match}</span>`)
-        .replace(TS_PATTERNS.string, match => `<span class="string">${match}</span>`)
-        .replace(TS_PATTERNS.keyword, match => `<span class="keyword">${match}</span>`)
-        .replace(TS_PATTERNS.type, match => `<span class="class">${match}</span>`)
-        .replace(TS_PATTERNS.function, match => `<span class="function">${match}</span>`)
-        .replace(TS_PATTERNS.number, match => `<span class="number">${match}</span>`)
-        .replace(TS_PATTERNS.operator, match => `<span class="operator">${match}</span>`)
-        .replace(TS_PATTERNS.punctuation, match => `<span class="punctuation">${match}</span>`);
+        .replace(TS_PATTERNS.comment, match => `<span class="comment" style="color:${TOKEN_COLORS.comment}">${match}</span>`)
+        .replace(TS_PATTERNS.string, match => `<span class="string" style="color:${TOKEN_COLORS.string}">${match}</span>`)
+        .replace(TS_PATTERNS.keyword, match => `<span class="keyword" style="color:${TOKEN_COLORS.keyword}">${match}</span>`)
+        .replace(TS_PATTERNS.type, match => `<span class="class" style="color:${TOKEN_COLORS.class}">${match}</span>`)
+        .replace(TS_PATTERNS.function, match => `<span class="function" style="color:${TOKEN_COLORS.function}">${match}</span>`)
+        .replace(TS_PATTERNS.number, match => `<span class="number" style="color:${TOKEN_COLORS.number}">${match}</span>`)
+        .replace(TS_PATTERNS.operator, match => `<span class="operator" style="color:${TOKEN_COLORS.operator}">${match}</span>`)
+        .replace(TS_PATTERNS.punctuation, match => `<span class="punctuation" style="color:${TOKEN_COLORS.punctuation}">${match}</span>`);
       break;
   }
   
