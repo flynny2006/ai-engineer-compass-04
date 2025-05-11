@@ -35,7 +35,7 @@ const HTML_PATTERNS = {
 const CSS_PATTERNS = {
   property: /[a-zA-Z-]+\s*:/g,
   value: /:\s*[^;}]+/g,
-  selector: /[a-zA-Z0-9_.-#:]+\s*{/g,
+  selector: /[a-zA-Z0-9_.\-#:]+\s*{/g,  // Fixed: Changed order of characters in the range
   string: /"[^"]*"|'[^']*'/g,
   comment: /\/\*[\s\S]*?\*\//g,
   unit: /\b\d+(%|px|em|rem|vh|vw|pt|ex|cm|mm|in)\b/g,
